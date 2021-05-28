@@ -1,0 +1,11 @@
+{
+    "version": 1.0,
+
+    "menu": {
+        "nfs-manager": {
+            "label": "NFS",
+            "path": "nfs-manager.html",
+            "order": 115
+        }
+    }
+}
