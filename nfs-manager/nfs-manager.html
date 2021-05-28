@@ -31,7 +31,39 @@
     <div class="pf-c-page">
         <div class="pf-c-page__main" tabindex="-1">
             <section class="pf-c-page__main-section">
-                
+
+                <div id="blurred-screen">
+					<!-- Main-info indicator -->
+					<div class="no-margin main-info" id="main-info">
+						<span id="main-info-icon"></span>
+						<span id="main-info-text"></span>
+					</div>
+				</div>
+
+                <article class="pf-c-card">
+                    <div class="pf-c-card__header">
+                        <div class="pf-c-card__title">
+                            <h2 class="pf-m-lg">NFS Manager</h2>
+                        </div>
+                    </div>
+                    <div class="pf-c-card__body">
+                        <div>
+                            IP:
+                            <input type="text" id="input-ip">
+                        </div>
+                        <br>
+                        <div>
+                            Path:
+                            <input type="text" id="input-path">
+                        </div>
+                        <br>
+                        <button class="pf-c-button pf-m-primary" id="create-nfs">YEET!</button>
+                    </div>
+                    <div class="no-margin" id="nfs-info">
+                        <span id="nfs-info-icon"></span>
+                        <span id="nfs-info-text"></span>
+                    </div>
+                </article>
             </section>
         </div>
     </div>
