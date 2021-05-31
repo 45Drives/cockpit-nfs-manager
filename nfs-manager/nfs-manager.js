@@ -112,6 +112,14 @@ function fatal_error(message) {
  * Returns: Nothing
  */
 function show_nfs_modal() {
+    var inputs = document.getElementsByTagName("input")
+    
+    for (var item in inputs) {
+        if(inputs[item].type == "text") {
+            inputs[item].value = ""
+        }
+    }
+
     var modal = document.getElementById("nfs-modal");
     modal.style.display = "block";
 }
@@ -149,21 +157,59 @@ function create_nfs() {
     var proc = cockpit.spawn(["/usr/share/cockpit/nfs-manager/scripts/nfs_add.py", name, path, ip]);
     proc.done(function () {
         populate_nfs_list();
-        set_success("nfs", "Successfully added " + name + " NFS to server.", timeout_ms);
+        set_success("nfs", "Added " + name + " NFS to server.", timeout_ms);
         hide_nfs_modal();
     });
     proc.fail(function (data) {
-        set_error("nfs-modal", "Error: " + data, timeout_ms);
+        set_error("nfs-modal", "Could not add NFS: " + data, timeout_ms);
+    });
+}
+
+/* Name: rm_nfs
+ * Receives: name
+ * Does: Runs the nfs_remove script with inputted entry name to remove said NFS.
+ * Also removes elements list from table.
+ * Returns: Nothing
+ */
+function rm_nfs(name) {
+    var proc = cockpit.spawn(["/usr/share/cockpit/nfs-manager/scripts/nfs_remove.py", name]);
+    proc.done(function () {
+        populate_nfs_list();
+        set_success("nfs", "Removed " + name + " NFS from server.", timeout_ms);
+        hide_rm_nfs_modal();
+    });
+    proc.fail(function (data) {
+        set_error("nfs", "Could not remove NFS: " + data, timeout_ms);
+        hide_rm_nfs_modal();
     });
 }
 
 /* Name: show_rm_nfs_modal
- * Receives: entry_name, element_list 
+ * Receives: entry_name
  * Does: Shows remove NFS model
  * Returns: Nothing
  */
-function show_rm_nfs_modal(entry_name, element_list) {
-    console.log(entry_name + ": " + element_list)
+function show_rm_nfs_modal(entry_name) {
+    var nfs_to_rm = document.getElementsByClassName('nfs-to-remove');
+    for (var items in nfs_to_rm) {
+        nfs_to_rm[items].innerText = entry_name;
+    }
+    var modal = document.getElementById("rm-nfs-modal");
+    modal.style.display = "block";
+    var continue_rm_nfs = document.getElementById("continue-rm-nfs");
+    continue_rm_nfs.onclick = function () {
+        rm_nfs(entry_name);
+    };
+}
+
+/* Name: hide_rm_nfs_modal
+ * Receives: Nothing
+ * Does: Hides remove NFS model
+ * Returns: Nothing
+ */
+function hide_rm_nfs_modal() {
+    var modal = document.getElementById("rm-nfs-modal");
+    modal.style.display = "none";
 }
 
 /* Name: create_list_entry
@@ -193,7 +239,7 @@ function create_list_entry(name, path, ip, permissions, on_delete) {
     var del_div = document.createElement("span");
     del_div.classList.add("circle-icon", "circle-icon-danger");
     del_div.addEventListener("click", function () {
-        on_delete(name, [del, entry_permissions, entry_ip, entry_path, entry_name, entry]);
+        on_delete(name);
     });
     del.appendChild(del_div);
 
@@ -223,12 +269,20 @@ function populate_nfs_list() {
     });
     proc.done(function (data) {
         var obj = JSON.parse(data)
-        console.log(obj)
 
         if (obj.length === 0) {
-            var msg = document.createElement("div");
-            msg.innerText = 'No NFS. Click the "plus" to add one.';
-            msg.classList.add("row-45d");
+            var msg = document.createElement("tr");
+            var name = document.createElement("td");
+            name.innerText = 'No NFSs. Click the "plus" to add one.';
+            var path = document.createElement("td");
+            var ip = document.createElement("td");
+            var perm = document.createElement("td");
+            var del = document.createElement("td");
+            msg.appendChild(name)
+            msg.appendChild(ip)
+            msg.appendChild(path)
+            msg.appendChild(perm)
+            msg.appendChild(del)
             nfs_list.appendChild(msg);
         }
         else {
@@ -298,6 +352,7 @@ function set_up_buttons() {
     document.getElementById("add-nfs-btn").addEventListener("click", create_nfs);
     document.getElementById("show-nfs-modal").addEventListener("click", show_nfs_modal);
     document.getElementById("hide-nfs-modal").addEventListener("click", hide_nfs_modal);
+    document.getElementById("cancel-rm-nfs").addEventListener("click", hide_rm_nfs_modal);
 }
 
 /* Name: main

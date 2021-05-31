@@ -16,47 +16,9 @@
 	along with Cockpit NFS manager.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from os import name
-import re
 import sys
 import subprocess
 from optparse import OptionParser
-
-# Name: create_dir
-# Receives: Path
-# Does: Checks if directory exists, if not, create it.
-# Returns: Nothing
-def create_dir(path):
-    if subprocess.call(["stat", path], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0:
-        print("Directory already exist, using it...")
-        return
-    try:
-        print("Creating directory:", path)
-        subprocess.run(["mkdir", "-p", path])
-    except OSError:
-        print("Cannot make directory.")
-        sys.exit(1)
-        
-# Name: create_permissions
-# Receives: Path
-# Does: Updates permissions of new made or existing path.
-# Returns: Nothing
-def create_permissions(path):
-    print("Writing permissions...")
-    proc = subprocess.call(["chown", "nobody:nogroup", path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    proc2 = subprocess.call(["chmod", "777", path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if (proc == 1 | proc2 == 1):
-        print("Could not change permissions.")
-        sys.exit(1)
-
-# Name: write_exports
-# Receives: Name, Path and client ip
-# Does: Enters name, path and clients ip into exports config.
-# Returns: Nothing
-def write_exports(name, path, ip):
-    print("Writing to /etc/exports")
-    with open("/etc/exports", "a") as f:
-        f.write("\n# Name: " + name + "\n" + path + " " + ip + "(rw,sync,no_subtree_check)")
 
 # Name: reset_config
 # Receives: Nothing
@@ -76,17 +38,40 @@ def reset_config():
         print("Could not restart nfs-kernel-system, do you have it on your system?")
         sys.exit(1)
 
-# Name: make_nfs
-# Receives: Name, Path and Ip
-# Does: Runs all functions that launches certian commands to make nfs
+# Name: remove_nfs
+# Receives: Name and del_dir
+# Does: Parses /etc/exports for the names of NFS(s) to be deleted, remove them from list.
+# Then rewrite /etc/exports with new file. Delete directroy if flagged.
 # Returns: Nothing
-def make_nfs(name, path, ip):
-    create_dir(path)
-    create_permissions(path)
-    write_exports(name, path, ip)
-    reset_config()
-    print("Done! Please mount " + path + " to your directory of choosing on your own system!")
-    print("sudo mount <host-ip>:" + path + " <path to dir>")
+def remove_nfs(name):
+    try:
+        does_exist = False
+        file = open("/etc/exports", "r")
+        lines = file.readlines()
+        file.close()
+        for i in range(0, len(lines), 1):
+            if("Name:" in lines[i]):
+                if(name + "\n" in lines[i]):
+                    print("Removing: " + lines[i])
+                    lines.remove(lines[i])
+                    print("Removing: " + lines[i])
+                    lines.remove(lines[i])
+                    does_exist = True
+                    break
+        
+        if does_exist:
+            print("Rewriting exports...")
+            file = open("/etc/exports", "w")
+            file.write("".join(lines))
+            file.close()
+            reset_config()
+        else:
+            print("That NFS does not exist.")
+            sys.exit(1)
+
+    except OSError:
+        print(OSError)
+        sys.exit(1) 
 
 # Name: main
 # Receives: nothing
@@ -96,10 +81,11 @@ def make_nfs(name, path, ip):
 def main():
     parser = OptionParser()
     (options, args) = parser.parse_args()
-    if len(args) < 3:
-        print("Not enough arguments!\nnfs_add <name> <path> <client-ip>")
+    if len(args) < 1:
+        print("Not enough arguments!\nnfs_remove <name>")
         sys.exit(1)
-    make_nfs(args[0], args[1], args[2])
+    remove_nfs(args[0])
+
 
 if __name__ == "__main__":
     main()

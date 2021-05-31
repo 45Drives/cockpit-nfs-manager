@@ -29,6 +29,7 @@ def main():
     try:
         file = open("/etc/exports", "r")
         lines = file.readlines()
+        file.close()
         for i in range(0, len(lines), 1):
             if("Name:" in lines[i]):
                 name = lines[i][8:-1]

@@ -124,3 +124,65 @@
 .flex-align-right {
     justify-content: flex-end;
 }
+
+.bold-text {
+    font-weight: bold;
+}
+
+.col-45d {
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+}
+
+.modal-content > .col-45d {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.flex-45d-stretch {
+    align-items: stretch;
+}
+
+.form-row {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    justify-content: flex-end;
+    padding: 5px;
+    align-items: stretch;
+}
+
+.form-row > label {
+    flex: 1;
+}
+
+.form-row > input {
+    flex: 3 0 1em;
+    margin-bottom: 11pt;
+}
+
+.form-row > input[type="checkbox"] {
+    flex: 0;
+}
+
+.form-row > .input-feedback-group {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    flex: 3 0 1em;
+}
+
+.input-feedback-group > input {
+    flex: 3 0 1em;
+}
+
+.form-row > .padding {
+    flex: 3 0 1em;
+}
+
