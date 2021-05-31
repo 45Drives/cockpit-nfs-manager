@@ -113,12 +113,54 @@ function fatal_error(message) {
  */
 function show_nfs_modal() {
     var inputs = document.getElementsByTagName("input")
+    var is_clicked = false
     
     for (var item in inputs) {
         if(inputs[item].type == "text") {
             inputs[item].value = ""
         }
     }
+
+    document.getElementById("add-nfs-btn").addEventListener("click", function() {
+        var ip = document.getElementById("input-ip").value;
+        var path = document.getElementById("input-path").value;
+        var name = document.getElementById("input-name").value;
+        var options = document.getElementById("input-perms").value;
+
+        if (name == "") {
+            set_error("nfs-modal", "Enter a name.", timeout_ms)
+        }
+        else if (path == "") {
+            set_error("nfs-modal", "Enter a path.", timeout_ms)
+        }
+        else if (path[0] != "/") {
+            set_error("nfs-modal", "Path has to be absolute.", timeout_ms)
+        }
+        else if (ip == "") {
+            set_error("nfs-modal", "Enter an IP.", timeout_ms)
+        }
+        else {
+            if (options == "") {
+                options = "rw,sync,no_subtree_check";
+            }
+            if (is_clicked) {
+                create_nfs(ip, path, name, options);
+            }
+            else {
+                var proc = cockpit.spawn(["stat", path])
+                proc.done(function() {
+                    create_nfs(ip, path, name, options);
+                });
+                proc.fail(function() {
+                    is_clicked = true
+                    setTimeout(function () {
+                        is_clicked=false;
+                    }, timeout_ms+1000);
+                    set_error("nfs-modal", "Path does not exist. Press 'Add' again to create.", timeout_ms);
+                });
+            }
+        }
+    });
 
     var modal = document.getElementById("nfs-modal");
     modal.style.display = "block";
@@ -149,16 +191,7 @@ function clear_setup_spinner() {
  * Does: Takes inputted IP, and path and launches CLI command with said inputs
  * Returns: Nothing
  */
-function create_nfs() {
-    var ip = document.getElementById("input-ip").value;
-    var path = document.getElementById("input-path").value;
-    var name = document.getElementById("input-name").value;
-    var options = document.getElementById("input-perms").value;
-
-    if (options == "") {
-        options = "rw,sync,no_subtree_check";
-    }
-
+function create_nfs(ip, path, name, options) {
     var proc = cockpit.spawn(["/usr/share/cockpit/nfs-manager/scripts/nfs_add.py", name, path, ip, options]);
     proc.done(function () {
         populate_nfs_list();
@@ -354,7 +387,6 @@ function check_permissions() {
  * Returns: Nothing
  */
 function set_up_buttons() {
-    document.getElementById("add-nfs-btn").addEventListener("click", create_nfs);
     document.getElementById("show-nfs-modal").addEventListener("click", show_nfs_modal);
     document.getElementById("hide-nfs-modal").addEventListener("click", hide_nfs_modal);
     document.getElementById("cancel-rm-nfs").addEventListener("click", hide_rm_nfs_modal);
