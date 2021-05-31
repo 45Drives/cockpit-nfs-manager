@@ -153,8 +153,13 @@ function create_nfs() {
     var ip = document.getElementById("input-ip").value;
     var path = document.getElementById("input-path").value;
     var name = document.getElementById("input-name").value;
+    var options = document.getElementById("input-perms").value;
 
-    var proc = cockpit.spawn(["/usr/share/cockpit/nfs-manager/scripts/nfs_add.py", name, path, ip]);
+    if (options == "") {
+        options = "rw,sync,no_subtree_check";
+    }
+
+    var proc = cockpit.spawn(["/usr/share/cockpit/nfs-manager/scripts/nfs_add.py", name, path, ip, options]);
     proc.done(function () {
         populate_nfs_list();
         set_success("nfs", "Added " + name + " NFS to server.", timeout_ms);

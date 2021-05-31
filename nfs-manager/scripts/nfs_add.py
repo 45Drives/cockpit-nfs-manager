@@ -50,13 +50,13 @@ def create_permissions(path):
         sys.exit(1)
 
 # Name: write_exports
-# Receives: Name, Path and client ip
+# Receives: Name, Path, Client IP and Options
 # Does: Enters name, path and clients ip into exports config.
 # Returns: Nothing
-def write_exports(name, path, ip):
+def write_exports(name, path, ip, options):
     print("Writing to /etc/exports")
     with open("/etc/exports", "a") as f:
-        f.write("\n# Name: " + name + "\n" + path + " " + ip + "(rw,sync,no_subtree_check)")
+        f.write("\n# Name: " + name + "\n" + path + " " + ip + "(" + options + ")")
 
 # Name: reset_config
 # Receives: Nothing
@@ -77,13 +77,13 @@ def reset_config():
         sys.exit(1)
 
 # Name: make_nfs
-# Receives: Name, Path and Ip
+# Receives: Name, Path, IP and Options
 # Does: Runs all functions that launches certian commands to make nfs
 # Returns: Nothing
-def make_nfs(name, path, ip):
+def make_nfs(name, path, ip, options):
     create_dir(path)
     create_permissions(path)
-    write_exports(name, path, ip)
+    write_exports(name, path, ip, options)
     reset_config()
     print("Done! Please mount " + path + " to your directory of choosing on your own system!")
     print("sudo mount <host-ip>:" + path + " <path to dir>")
@@ -96,10 +96,10 @@ def make_nfs(name, path, ip):
 def main():
     parser = OptionParser()
     (options, args) = parser.parse_args()
-    if len(args) < 3:
-        print("Not enough arguments!\nnfs_add <name> <path> <client-ip>")
+    if len(args) < 4:
+        print("Not enough arguments!\nnfs_add <name> <path> <client-ip> <options>")
         sys.exit(1)
-    make_nfs(args[0], args[1], args[2])
+    make_nfs(args[0], args[1], args[2], args[3])
 
 if __name__ == "__main__":
     main()
