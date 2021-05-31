@@ -56,7 +56,7 @@ def create_permissions(path):
 def write_exports(name, path, ip):
     print("Writing to /etc/exports")
     with open("/etc/exports", "a") as f:
-        f.write("\n#" + name + "\n" + path + " " + ip + "(rw,sync,no_subtree_check)")
+        f.write("\n# Name: " + name + "\n" + path + " " + ip + "(rw,sync,no_subtree_check)")
 
 # Name: reset_config
 # Receives: Nothing
@@ -97,7 +97,7 @@ def main():
     parser = OptionParser()
     (options, args) = parser.parse_args()
     if len(args) < 3:
-        print("Not enough arguments!\nnfs_setup <name> <path> <client-ip>")
+        print("Not enough arguments!\nnfs_add <name> <path> <client-ip>")
         sys.exit(1)
     make_nfs(args[0], args[1], args[2])
 
