@@ -148,11 +148,11 @@ function create_nfs() {
 
     var proc = cockpit.spawn(["/usr/share/cockpit/nfs-manager/scripts/nfs_setup.py", name, path, ip]);
     proc.done(function () {
-        set_success("nfs", "Successfully setup NFS! Now mount on your system.", timeout_ms);
+        set_success("nfs", "Successfully added " + name + " NFS to server.", timeout_ms);
         hide_nfs_modal()
     });
     proc.fail(function (data) {
-        set_error("nfs", "Error: " + data, timeout_ms);
+        set_error("nfs-modal", "Error: " + data, timeout_ms);
     });
 }
 
