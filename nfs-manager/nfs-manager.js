@@ -146,17 +146,102 @@ function create_nfs() {
     var path = document.getElementById("input-path").value;
     var name = document.getElementById("input-name").value;
 
-    var proc = cockpit.spawn(["/usr/share/cockpit/nfs-manager/scripts/nfs_setup.py", name, path, ip]);
+    var proc = cockpit.spawn(["/usr/share/cockpit/nfs-manager/scripts/nfs_add.py", name, path, ip]);
     proc.done(function () {
+        populate_nfs_list();
         set_success("nfs", "Successfully added " + name + " NFS to server.", timeout_ms);
-        hide_nfs_modal()
+        hide_nfs_modal();
     });
     proc.fail(function (data) {
         set_error("nfs-modal", "Error: " + data, timeout_ms);
     });
 }
 
+/* Name: show_rm_nfs_modal
+ * Receives: entry_name, element_list 
+ * Does: Shows remove NFS model
+ * Returns: Nothing
+ */
+function show_rm_nfs_modal(entry_name, element_list) {
+    console.log(entry_name + ": " + element_list)
+}
 
+/* Name: create_list_entry
+ * Receives: name, path, ip, permissions, on_delete 
+ * Does: Makes a entry for a list
+ * Returns: entry
+ */
+function create_list_entry(name, path, ip, permissions, on_delete) {
+    var entry = document.createElement("tr");
+    entry.classList.add("highlight-entry");
+
+    var entry_name = document.createElement("td");
+    entry_name.innerText = name;
+
+    var entry_path = document.createElement("td");
+    entry_path.innerText = path;
+
+    var entry_ip = document.createElement("td");
+    entry_ip.innerText = ip;
+
+    var entry_permissions = document.createElement("td");
+    entry_permissions.innerText = permissions;
+
+    var del = document.createElement("td");
+    del.style.padding = "2px"
+    del.style.textAlign = "right"
+    var del_div = document.createElement("span");
+    del_div.classList.add("circle-icon", "circle-icon-danger");
+    del_div.addEventListener("click", function () {
+        on_delete(name, [del, entry_permissions, entry_ip, entry_path, entry_name, entry]);
+    });
+    del.appendChild(del_div);
+
+    entry.appendChild(entry_name);
+    entry.appendChild(entry_path);
+    entry.appendChild(entry_ip);
+    entry.appendChild(entry_permissions);
+    entry.appendChild(del);
+    return entry;
+}
+
+/* Name: populate_nfs_list
+ * Receives: Nothing 
+ * Does: Populate the main table with list of current NFS(s).
+ * Returns: Nothing
+ */
+function populate_nfs_list() {
+    var nfs_list = document.getElementById("nfs-list")
+    
+    while (nfs_list.firstChild) {
+        nfs_list.removeChild(nfs_list.firstChild);
+    }
+
+    var proc = cockpit.spawn(["/usr/share/cockpit/nfs-manager/scripts/nfs_list.py"], {
+        err: "out",
+        superuser: "require",
+    });
+    proc.done(function (data) {
+        var obj = JSON.parse(data)
+        console.log(obj)
+
+        if (obj.length === 0) {
+            var msg = document.createElement("div");
+            msg.innerText = 'No NFS. Click the "plus" to add one.';
+            msg.classList.add("row-45d");
+            nfs_list.appendChild(msg);
+        }
+        else {
+            obj.forEach(function(obj) {
+                var item = create_list_entry(obj.Name, obj.Path, obj.IP, obj.Permissions, show_rm_nfs_modal)
+                nfs_list.appendChild(item);
+            });
+        }
+    });
+    proc.fail(function (ex, data) {
+        set_error("nfs", data);
+    });
+}
 
 /* Name: setup
  * Receives: Nothing 
@@ -164,7 +249,7 @@ function create_nfs() {
  * Returns: Nothing
  */
 async function setup() {
-    //await populate_nfs_list();
+    await populate_nfs_list();
     set_up_buttons();
     clear_setup_spinner();
 }

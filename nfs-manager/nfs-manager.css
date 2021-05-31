@@ -72,3 +72,55 @@
     background-color: rgb(0, 0, 0); /* Fallback color */
     background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
 }
+
+.highlight-entry:hover {
+    background-color: #cce0f5;
+}
+
+.circle-icon {
+    text-decoration: none;
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    flex: none;
+    -webkit-flex: none;
+    overflow: visible;
+    font-size: 18pt;
+    font-weight: light;
+    margin: 5px;
+    height: 17px;
+    width: 17px;
+    padding: 0;
+    border-radius: 50%;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    text-align: -webkit-center;
+    -webkit-align-items: center;
+    -webkit-justify-content: center;
+    /* position: absolute;
+    left:2.5em;
+    bottom: .2em; */
+}
+
+.circle-icon:after {
+    position: relative;
+    content: "\274c";
+    font-size: 15px;
+    left: 0.5px;
+    text-align: center;
+}
+
+.circle-icon:hover:after {
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.circle-icon-danger {
+    background-color: rgba(255, 255, 255, 0);
+    color: #c9190b;
+}
+
+.flex-align-right {
+    justify-content: flex-end;
+}
