@@ -144,8 +144,9 @@ function clear_setup_spinner() {
 function create_nfs() {
     var ip = document.getElementById("input-ip").value;
     var path = document.getElementById("input-path").value;
+    var name = document.getElementById("input-name").value;
 
-    var proc = cockpit.spawn(["/usr/share/cockpit/nfs-manager/scripts/nfs_setup.py", path, ip]);
+    var proc = cockpit.spawn(["/usr/share/cockpit/nfs-manager/scripts/nfs_setup.py", name, path, ip]);
     proc.done(function () {
         set_success("nfs", "Successfully setup NFS! Now mount on your system.", timeout_ms);
         hide_nfs_modal()
