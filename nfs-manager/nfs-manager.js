@@ -97,10 +97,43 @@ function fatal_error(message) {
     set_error("main", message);
     var all_buttons = document.getElementsByTagName("button");
     var backScreen = document.getElementById("blurred-screen");
+    var spinner = document.getElementById("spinner");
+    spinner.style.display = "none";
     backScreen.style.display = "inline-flex";
     for (let button of all_buttons) {
         button.disabled = true;
     }
+}
+
+
+/* Name: show_nfs_modal
+ * Receives: Nothing 
+ * Does: Shows "Add NFS" pop up
+ * Returns: Nothing
+ */
+function show_nfs_modal() {
+    var modal = document.getElementById("nfs-modal");
+    modal.style.display = "block";
+}
+
+/* Name: hide_nfs_modal
+ * Receives: Nothing 
+ * Does: Hides "Add NFS" pop up
+ * Returns: Nothing
+ */
+function hide_nfs_modal() {
+    var modal = document.getElementById("nfs-modal");
+    modal.style.display = "none";
+}
+
+/* Name: clear_setup_spinner
+ * Receives: Nothing 
+ * Does: Clears spinner logo from screen
+ * Returns: Nothing
+ */
+function clear_setup_spinner() {
+    var wrapper = document.getElementById("blurred-screen");
+    wrapper.style.display = "none";
 }
 
 /* Name: create_nfs
@@ -115,19 +148,79 @@ function create_nfs() {
     var proc = cockpit.spawn(["/usr/share/cockpit/nfs-manager/scripts/nfs_setup.py", path, ip]);
     proc.done(function () {
         set_success("nfs", "Successfully setup NFS! Now mount on your system.", timeout_ms);
+        hide_nfs_modal()
     });
     proc.fail(function (data) {
         set_error("nfs", "Error: " + data, timeout_ms);
     });
 }
 
-/* Name: main
+
+
+/* Name: setup
+ * Receives: Nothing 
+ * Does: awaits populating the list of current NFS(s). Once finished setup buttons and clear branding
+ * Returns: Nothing
+ */
+async function setup() {
+    //await populate_nfs_list();
+    set_up_buttons();
+    clear_setup_spinner();
+}
+
+/* Name: check_nfs
+ * Receives: Nothing 
+ * Does: tries running `showmount -e` to check if nfs is installed, if successful, calls setup(), if unsuccessful,
+ * shows error message and disables buttons
+ * Returns: Nothing
+ */
+function check_nfs() {
+    var proc = cockpit.spawn(["showmount", "-e"], { superuser: "require" });
+    proc.done(function () {
+        setup()
+    });
+    proc.fail(function (data) {
+        fatal_error("Failed to load NFS services. Do you have NFS installed?")
+    });
+}
+
+/* Name: check_permissions
+ * Receives: Nothing 
+ * Does: Checks if user is root. If not, give a fatal error, if yes, call check_nfs.
+ * Returns: Nothing
+ */
+function check_permissions() {
+    let root_check = cockpit.permission({ admin: true });
+	root_check.addEventListener(
+		"changed", 
+		function() {
+			if(root_check.allowed){
+				check_nfs();
+			}else{
+				fatal_error("You do not have administrator access.");
+			}
+	 	}
+	)
+}
+
+/* Name: set_up_buttons
  * Receives: Nothing 
  * Does: Sets up buttons
  * Returns: Nothing
  */
+function set_up_buttons() {
+    document.getElementById("add-nfs-btn").addEventListener("click", create_nfs);
+    document.getElementById("show-nfs-modal").addEventListener("click", show_nfs_modal);
+    document.getElementById("hide-nfs-modal").addEventListener("click", hide_nfs_modal);
+}
+
+/* Name: main
+ * Receives: Nothing 
+ * Does: Runs check_permissions to see if user is superuser
+ * Returns: Nothing
+ */
 function main() {
-    document.getElementById("create-nfs").addEventListener("click", create_nfs);
+    check_permissions()
 }
 
 main();

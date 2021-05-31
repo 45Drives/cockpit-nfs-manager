@@ -33,6 +33,9 @@
             <section class="pf-c-page__main-section">
 
                 <div id="blurred-screen">
+                    <!-- logo -->
+                    <div class="spinner-45d" id="spinner"></div>
+                    
 					<!-- Main-info indicator -->
 					<div class="no-margin main-info" id="main-info">
 						<span id="main-info-icon"></span>
@@ -45,28 +48,64 @@
                         <div class="pf-c-card__title">
                             <h2 class="pf-m-lg">NFS Manager</h2>
                         </div>
-                    </div>
-                    <div class="pf-c-card__body">
-                        <div>
-                            IP:
-                            <input type="text" id="input-ip">
+                        <div class="pf-c-card__actions">
+                            <button type="button" class="pf-c-button pf-m-primary" id="show-nfs-modal"><span
+                                    class="fa fa-plus"></span></button>
                         </div>
-                        <br>
-                        <div>
-                            Path:
-                            <input type="text" id="input-path">
-                        </div>
-                        <br>
-                        <button class="pf-c-button pf-m-primary" id="create-nfs">YEET!</button>
                     </div>
+                    <div class="pf-c-card__body contains-list">
+                        <table class="ct-table pf-c-table pf-m-grid-md pf-m-compact">
+                            <thread>
+                                <tr>
+                                    <th class="pf-m-width-30 pf-c-table__sort pf-m-selected">Name</th>
+                                    <th class="pf-m-width-30 pf-c-table__sort pf-m-selected">Path</th>
+                                    <th class="pf-m-width-30 pf-c-table__sort pf-m-selected">IP(s)</th>
+                                </tr>
+                                
+                            </thread>
+                        </table>
+                    </div>
+                </article>
+
+                
+            </section>
+        </div>
+    </div>
+
+    <!-- Modals -->
+
+    <div id="nfs-modal" class="modal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="pf-c-modal-box__tittle"><span class="pf-modal-box__title-text">Add NFS</span></h1>
+				</div>
+				<div class="modal-body">
+                    <div>
+                        IP:
+                        <input type="text" id="input-ip">
+                    </div>
+                    <br>
+                    <div>
+                        Path:
+                        <input type="text" id="input-path">
+                    </div>
+                    <br>
                     <div class="no-margin" id="nfs-info">
                         <span id="nfs-info-icon"></span>
                         <span id="nfs-info-text"></span>
                     </div>
-                </article>
-            </section>
-        </div>
-    </div>
+				</div>
+				<div class="modal-footer row-45d flex-align-left">
+					<button type="button" class="pf-c-button pf-m-primary" type="button"
+						id="add-nfs-btn">Add</button>
+					<button type="button" class="pf-c-button pf-m-secondary" type="button"
+						id="hide-nfs-modal">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </body>
 
 </html>

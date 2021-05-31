@@ -15,7 +15,7 @@
     along with Cockpit NFS Manager.  If not, see <https://www.gnu.org/licenses/>. 
 */
 #blurred-screen {
-    display: none;
+    display: inline-flex;
     align-items: center;
     align-content: center;
     justify-content: center;
@@ -38,10 +38,37 @@
     }
 }
 
+.spinner-45d {
+    display: inline-block;
+    background-image: url("branding/spinner.svg");
+    filter: opacity(50%);
+    background-size: contain;
+    height: 20em;
+    width: 20em;
+    animation: rotation 2s infinite linear;
+}
+
 .no-margin {
     margin: 0;
 }
 
 .main-info {
     position: inherit;
+}
+
+.modal-footer {
+    text-align: right;
+}
+
+.row-45d {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: baseline;
+}
+
+.modal {
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
 }
