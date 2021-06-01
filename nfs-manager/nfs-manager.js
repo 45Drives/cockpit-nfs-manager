@@ -112,23 +112,44 @@ function fatal_error(message) {
  * Returns: Nothing
  */
 function show_nfs_modal() {
-    var inputs = document.getElementsByTagName("input")
-    var is_clicked = false
+    var inputs = document.getElementsByTagName("input");
     
     for (var item in inputs) {
         if(inputs[item].type == "text") {
-            inputs[item].value = ""
+            inputs[item].value = "";
         }
     }
 
-    document.getElementById("add-nfs-btn").addEventListener("click", function() {
-        var ip = document.getElementById("input-ip").value;
-        var path = document.getElementById("input-path").value;
-        var name = document.getElementById("input-name").value;
-        var options = document.getElementById("input-perms").value;
+    var modal = document.getElementById("nfs-modal");
+    modal.style.display = "block";
+}
+
+function add_nfs() {
+    var ip = document.getElementById("input-ip").value;
+    var path = document.getElementById("input-path").value;
+    var name = document.getElementById("input-name").value;
+    var options = document.getElementById("input-perms").value;
+    var is_clicked = document.getElementById("is-clicked");
+    var name_exist = false;
+
+    var proc = cockpit.spawn(["/usr/share/cockpit/nfs-manager/scripts/nfs_list.py"], {
+        err: "out",
+        superuser: "require",
+    });
+    proc.done(function(data) {
+        var obj = JSON.parse(data)
+
+        for (var items in obj) {
+            if (name == obj[items].Name) {
+                name_exist = true;
+            }
+        }
 
         if (name == "") {
             set_error("nfs-modal", "Enter a name.", timeout_ms)
+        }
+        else if(name_exist) {
+            set_error("nfs-modal", "Name already exists.", timeout_ms)
         }
         else if (path == "") {
             set_error("nfs-modal", "Enter a path.", timeout_ms)
@@ -139,11 +160,11 @@ function show_nfs_modal() {
         else if (ip == "") {
             set_error("nfs-modal", "Enter an IP.", timeout_ms)
         }
-        else {
+        else {     
             if (options == "") {
                 options = "rw,sync,no_subtree_check";
             }
-            if (is_clicked) {
+            if (is_clicked.value == path) {
                 create_nfs(ip, path, name, options);
             }
             else {
@@ -152,18 +173,12 @@ function show_nfs_modal() {
                     create_nfs(ip, path, name, options);
                 });
                 proc.fail(function() {
-                    is_clicked = true
-                    setTimeout(function () {
-                        is_clicked=false;
-                    }, timeout_ms+1000);
+                    is_clicked.value = path
                     set_error("nfs-modal", "Path does not exist. Press 'Add' again to create.", timeout_ms);
                 });
             }
         }
     });
-
-    var modal = document.getElementById("nfs-modal");
-    modal.style.display = "block";
 }
 
 /* Name: hide_nfs_modal
@@ -390,6 +405,7 @@ function set_up_buttons() {
     document.getElementById("show-nfs-modal").addEventListener("click", show_nfs_modal);
     document.getElementById("hide-nfs-modal").addEventListener("click", hide_nfs_modal);
     document.getElementById("cancel-rm-nfs").addEventListener("click", hide_rm_nfs_modal);
+    document.getElementById("add-nfs-btn").addEventListener("click", add_nfs);
 }
 
 /* Name: main
