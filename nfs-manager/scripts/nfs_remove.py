@@ -20,6 +20,23 @@ import sys
 import subprocess
 from optparse import OptionParser
 
+# Name: check_config
+# Receives: Nothing
+# Does: Checks in /etc/exports exists/ is in correct format.
+# Returns: Nothing
+def check_config():
+    try:
+        file = open("/etc/exports", "r")
+        lines = file.readlines()
+        file.close()
+    except OSError:
+        print("Could not open /etc/exports. Do you have nfs installed?")
+        sys.exit(1)
+    
+    if len(lines) == 0 or lines[0] != "# Formmated for cockpit-nfs-manager\n":
+        print("Please run nfs_list.py for setup.")
+        sys.exit(1)
+
 # Name: reset_config
 # Receives: Nothing
 # Does: Export new shared directory as well as restart the nfs system.
@@ -79,6 +96,7 @@ def remove_nfs(name):
 # arguments. Chucks arguments into make_nfs function
 # Returns: Nothing
 def main():
+    check_config()
     parser = OptionParser()
     (options, args) = parser.parse_args()
     if len(args) < 1:
