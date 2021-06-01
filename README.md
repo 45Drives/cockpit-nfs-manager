@@ -1,18 +1,18 @@
 # cockpit-nfs-manager
 Cockpit plugin and CLI tool to manage NFS(s)
 
+### Managing NFS(s)
 ![Main Page](img/main_page.png)
-*Main Page*
 
 NFS Manager is an easy way to add and configure multiple NFSs at once.
 
+### Adding a NFS
 ![Adding A NFS](img/add_menu.png)
-*Adding NFS*
 
-Adding a NFS easy and customizable. You haven the ability to fully customizable the options of the NFS or leave it to defaults.
+Adding a NFS is easy and customizable. You have the ability to fully customizable options or leave the defaults.
 
+### Removing a NFS
 ![Removing a NFS](img/remove_menu.png)
-*Removing NFS*
 
 Removing a NFS is just as easy. With a couple clicks the NFS will be off your server!
 
