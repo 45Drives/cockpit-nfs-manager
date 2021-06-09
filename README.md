@@ -1,3 +1,5 @@
+This module is no longer updated. Please check https://github.com/45Drives/cockpit-file-sharing for the latest version.
+
 # cockpit-nfs-manager
 Cockpit plugin and CLI tool to manage NFS(s)
 
